@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "ページタイトルゲッター",
+  "version": "1.0",
+  "description": "現在開いているページのタイトルを取得して表示します。",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
