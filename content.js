@@ -1,29 +1,24 @@
-// Listenの記事ページからテキストを抽出するスクリプト
+console.log("★★★ My Content Script for Listen page has started! (Debug Mode Active) ★★★");
 
-console.log("★★★ My Content Script for Listen page has started! ★★★");
+// クラス名に 'replaceable-content' を含む全てのdiv要素を取得
+const textElements = document.querySelectorAll('div[class*="replaceable-content"]');
 
-// ページの読み込みが完了したら実行
-document.addEventListener('DOMContentLoaded', function() {
-  // クラス名に 'replaceable-content' を含む全てのdiv要素を取得
-  const contentDivs = Array.from(document.querySelectorAll('div[class*="replaceable-content"]'));
-  
-  if (contentDivs.length === 0) {
-    console.log('Listen抽出テキスト： 対象の要素が見つかりませんでした');
-    return;
+// 見つかった要素の数を出力
+console.log("Found elements with selector 'div[class*=\"replaceable-content\"]': ", textElements.length);
+
+// もし要素が1つ以上見つかれば、最初のいくつかの中身を表示してみる
+if (textElements.length > 0) {
+  console.log("--- First element ---");
+  console.log("innerText: [", textElements[0].innerText, "]");
+  console.log("textContent: [", textElements[0].textContent, "]");
+  console.log("HTML: ", textElements[0].innerHTML.substring(0, 200) + "..."); // HTMLの最初の200文字も見てみる
+
+  if (textElements.length > 1) {
+    console.log("--- Second element ---");
+    console.log("innerText: [", textElements[1].innerText, "]");
+    console.log("textContent: [", textElements[1].textContent, "]");
   }
-  
-  // 各div要素のテキストを取得して改行で結合
-  const extractedText = contentDivs
-    .map(div => div.innerText.trim())
-    .filter(text => text.length > 0) // 空のテキストを除外
-    .join('\n\n'); // 2つの改行で区切る
-  
-  // コンソールに出力
-  console.log('Listen抽出テキスト：', extractedText);
-  
-  // 後で拡張機能のポップアップからも見られるように、メッセージとして送信
-  chrome.runtime.sendMessage({
-    action: 'extractedText',
-    text: extractedText
-  });
-});
+} else {
+  // 要素が見つからなかった場合のメッセージ
+  console.log("No elements found with the specified selector. Please re-check the selector or the page's HTML structure and loading timing.");
+}
