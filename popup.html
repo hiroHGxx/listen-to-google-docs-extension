@@ -33,8 +33,15 @@
   </style>
 </head>
 <body>
-  <button id="getTitleButton">ページのタイトルを取得</button>
-  <div id="titleDisplay"></div>
+  <h2>Listen テキスト抽出ツール</h2>
+  <p>Listenのページでテキストを抽出するには、下のボタンをクリックしてください。</p>
+  
+  <button id="extractButton">テキストを抽出する</button>
+  
+  <div id="statusMessage" class="status-message" style="display: none;"></div>
+  
+  <textarea id="transcriptionDisplay" readonly placeholder="ここに抽出したテキストが表示されます"></textarea>
+  
   <script src="popup.js"></script>
 </body>
 </html>
