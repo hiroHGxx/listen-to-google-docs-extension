@@ -1,24 +1,27 @@
-console.log("★★★ My Content Script for Listen page has started! (Full Text Output Mode) ★★★");
+// content.js
+console.log("★★★ Content Script: Attempting to extract text... ★★★");
 
-// クラス名に 'replaceable-content' を含む全てのdiv要素を取得
 const textElements = document.querySelectorAll('div[class*="replaceable-content"]');
+let extractedData = null; // 送信するデータを格納する変数
 
-// 見つかった要素の数を出力
-console.log("Found elements with selector 'div[class*=\"replaceable-content\"]': ", textElements.length);
-
-// 全ての要素のテキストを表示
 if (textElements.length > 0) {
-  textElements.forEach((element, index) => {
-    console.log(`--- Element ${index + 1}/${textElements.length} ---`);
-    console.log(element.innerText);
-    console.log('\n'); // 要素の区切りに空行を追加
-  });
-  
-  // 全テキストを結合して出力（オプション）
-  const allText = Array.from(textElements).map(el => el.innerText).join('\n\n');
-  console.log('=== 全テキスト（結合版）===');
+  const allText = Array.from(textElements)
+                    .map(el => el.innerText.trim())
+                    .filter(text => text.length > 0)
+                    .join('\n\n'); // 各ブロックを2つの改行で区切る
+
+  console.log('=== 全テキスト（結合版）for sending ===');
   console.log(allText);
+  extractedData = { text: allText, error: null };
 } else {
-  // 要素が見つからなかった場合のメッセージ
-  console.log("No elements found with the specified selector. Please re-check the selector or the page's HTML structure and loading timing.");
+  console.log("No text elements found on this page.");
+  extractedData = { text: null, error: "文字起こしテキストが見つかりませんでした。" };
+}
+
+// 抽出結果（またはエラー情報）をポップアップやバックグラウンドに送信
+if (extractedData) {
+  chrome.runtime.sendMessage({
+    action: "listenTextExtracted", // アクション名を明確に
+    data: extractedData
+  });
 }
