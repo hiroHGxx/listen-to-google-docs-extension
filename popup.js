@@ -80,12 +80,42 @@ document.addEventListener('DOMContentLoaded', function() {
     resetButtonState();
   }
 
-  // メッセージリスナーを設定
+  // メッセージを受信したときの処理
   chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    if (message && message.action === 'extractionResult') {
-      handleExtractedData(message.data);
+    // メッセージの検証
+    if (!message || typeof message !== 'object') {
+      console.error('無効なメッセージを受信しました:', message);
+      return false;
     }
-    return true; // 非同期応答を許可
+    
+    // レスポンスを送信するためのフラグ
+    let responseSent = false;
+    
+    // 非同期処理の完了を待つため、明示的にtrueを返す
+    const sendResponseSafe = (response) => {
+      if (!responseSent) {
+        responseSent = true;
+        sendResponse(response);
+      }
+    };
+    
+    if (message.action === 'extractionResult') {
+      try {
+        handleExtractedData(message.data);
+        sendResponseSafe({ status: 'success' });
+      } catch (error) {
+        const errorMessage = 'メッセージ処理中にエラーが発生しました';
+        console.error(errorMessage, error);
+        showStatus(`エラー: ${errorMessage}`, 'error');
+        sendResponseSafe({ status: 'error', error: errorMessage });
+      }
+    } else {
+      console.warn('不明なアクション:', message.action);
+      sendResponseSafe({ status: 'error', error: '不明なアクション' });
+    }
+    
+    // 非同期応答をサポート
+    return true;
   });
 
   // content.jsを実行する関数

@@ -1,6 +1,12 @@
 // content.js
 
+// IIFEで全体をラップしてスコープを限定
+(function() {
+'use strict';
+
+// モジュールスコープの変数
 let isExtracting = false;
+let elementsToHide = [];
 
 // デバッグ用のログを出力する関数
 function debugLog(...args) {
@@ -69,8 +75,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function extractAndSendText() {
   // debugLog('extractAndSendText: 開始');
   
-  // 要素の表示状態を保存する配列を関数の先頭で宣言
-  let elementsToHide = [];
+  // 要素の表示状態を保存する配列をクリア
+  elementsToHide = [];
   
   try {
     // ページが完全に読み込まれるまで待機
@@ -261,6 +267,9 @@ async function extractAndSendText() {
 // 初期ログ（デバッグ時はコメントを外す）
 // console.log('Content Script: ページの読み込み状態:', document.readyState);
 // console.log('Content Script: ユーザーエージェント:', navigator.userAgent);
+
+// IIFEの終了
+})();
 
 // デバッグ用に要素を確認（デバッグ時はコメントを外す）
 // setTimeout(() => {
