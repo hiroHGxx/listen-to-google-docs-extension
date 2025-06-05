@@ -1,5 +1,7 @@
 // Listenの記事ページからテキストを抽出するスクリプト
 
+console.log("★★★ My Content Script for Listen page has started! ★★★");
+
 // ページの読み込みが完了したら実行
 document.addEventListener('DOMContentLoaded', function() {
   // クラス名に 'replaceable-content' を含む全てのdiv要素を取得
