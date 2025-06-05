@@ -4,7 +4,8 @@ let isExtracting = false;
 
 // デバッグ用のログを出力する関数
 function debugLog(...args) {
-  console.log('[Listen Text Extractor]', ...args);
+  // デバッグ時は以下のコメントを外す
+  // console.log('[Listen Text Extractor]', ...args);
 }
 
 // メッセージ受信のハンドラ
@@ -66,7 +67,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // テキストを抽出する関数
 async function extractAndSendText() {
-  debugLog('extractAndSendText: 開始');
+  // debugLog('extractAndSendText: 開始');
   
   // 要素の表示状態を保存する配列を関数の先頭で宣言
   let elementsToHide = [];
@@ -74,21 +75,21 @@ async function extractAndSendText() {
   try {
     // ページが完全に読み込まれるまで待機
     if (document.readyState !== 'complete') {
-      debugLog('ドキュメントの読み込みを待機中...');
+      // debugLog('ドキュメントの読み込みを待機中...');
       await new Promise((resolve, reject) => {
         if (document.readyState === 'complete') {
-          debugLog('ドキュメントは既に読み込み完了しています');
+          // debugLog('ドキュメントは既に読み込み完了しています');
           resolve();
         } else {
           const timer = setTimeout(() => {
             window.removeEventListener('load', onLoad);
-            debugLog('ドキュメントの読み込み待ちがタイムアウトしました');
+            // debugLog('ドキュメントの読み込み待ちがタイムアウトしました');
             resolve(); // タイムアウトしても処理を続行
           }, 3000); // 3秒でタイムアウト
           
           const onLoad = () => {
             clearTimeout(timer);
-            debugLog('ドキュメントの読み込みが完了しました');
+            // debugLog('ドキュメントの読み込みが完了しました');
             resolve();
           };
           
@@ -97,11 +98,11 @@ async function extractAndSendText() {
       });
     }
 
-    debugLog('ドキュメントの状態:', {
-      readyState: document.readyState,
-      title: document.title,
-      url: window.location.href
-    });
+    // debugLog('ドキュメントの状態:', {
+    //   readyState: document.readyState,
+    //   title: document.title,
+    //   url: window.location.href
+    // });
 
     // メインコンテンツを特定するためのセレクター
     const mainContentSelectors = [
@@ -149,7 +150,7 @@ async function extractAndSendText() {
       '[class*="btn"]'
     ];
 
-    debugLog('要素を非表示にします');
+    // debugLog('要素を非表示にします');
     // 除外要素を非表示にする
     elementsToHide = []; // 既に宣言されている変数を使用
     excludeSelectors.forEach(selector => {
@@ -170,7 +171,7 @@ async function extractAndSendText() {
     });
 
     try {
-      debugLog('メインコンテンツを検索中...');
+      // debugLog('メインコンテンツを検索中...');
       // メインコンテンツを探す
       let mainContent = null;
       let foundWithSelector = '';
@@ -178,23 +179,23 @@ async function extractAndSendText() {
       for (const selector of mainContentSelectors) {
         try {
           const elements = document.querySelectorAll(selector);
-          debugLog(`セレクタ "${selector}" で ${elements.length} 個の要素が見つかりました`);
+          // debugLog(`セレクタ "${selector}" で ${elements.length} 個の要素が見つかりました`);
           
           if (elements.length > 0) {
             const content = Array.from(elements).find(el => {
               const text = el.innerText || '';
               const isValid = text.length > 100; // ある程度の長さがあることを確認
-              debugLog(`要素チェック: 長さ=${text.length}, 有効=${isValid}`, {
-                selector,
-                text: text.substring(0, 50) + (text.length > 50 ? '...' : '')
-              });
+              // debugLog(`要素チェック: 長さ=${text.length}, 有効=${isValid}`, {
+                // selector,
+                // text: text.substring(0, 50) + (text.length > 50 ? '...' : '')
+              // });
               return isValid;
             });
             
             if (content) {
               mainContent = content;
               foundWithSelector = selector;
-              debugLog(`メインコンテンツをセレクタ "${selector}" で見つけました`);
+              // debugLog(`メインコンテンツをセレクタ "${selector}" で見つけました`);
               break;
             }
           }
@@ -205,12 +206,12 @@ async function extractAndSendText() {
 
       // メインコンテンツが見つからない場合はbody全体を使用
       const content = mainContent || document.body;
-      debugLog(`使用するコンテンツ: ${mainContent ? foundWithSelector : 'document.body'}`);
+      // debugLog(`使用するコンテンツ: ${mainContent ? foundWithSelector : 'document.body'}`);
       
       let text = '';
       try {
         text = content.innerText || content.textContent || '';
-        debugLog(`抽出したテキストの長さ: ${text.length} 文字`);
+        // debugLog(`抽出したテキストの長さ: ${text.length} 文字`);
       } catch (e) {
         console.error('テキストの抽出中にエラーが発生しました:', e);
         throw new Error(`テキストの抽出に失敗しました: ${e.message}`);
@@ -228,7 +229,7 @@ async function extractAndSendText() {
         throw new Error('テキストが見つかりませんでした');
       }
 
-      debugLog('テキストの抽出が完了しました');
+      // debugLog('テキストの抽出が完了しました');
       return text;
       
     } catch (error) {
@@ -240,7 +241,7 @@ async function extractAndSendText() {
     console.error('extractAndSendText でエラーが発生しました:', error);
     throw error; // エラーを再スロー
   } finally {
-    debugLog('クリーンアップを実行します');
+    // debugLog('クリーンアップを実行します');
     // 非表示にした要素を元に戻す
     if (elementsToHide && elementsToHide.length > 0) {
       elementsToHide.forEach(({ el, originalDisplay }) => {
@@ -253,48 +254,48 @@ async function extractAndSendText() {
         }
       });
     }
-    debugLog('extractAndSendText: 終了');
+    // // debugLog('extractAndSendText: 終了');
   }
 }
 
-// 初期ログ
-console.log('Content Script: ページの読み込み状態:', document.readyState);
-console.log('Content Script: ユーザーエージェント:', navigator.userAgent);
+// 初期ログ（デバッグ時はコメントを外す）
+// console.log('Content Script: ページの読み込み状態:', document.readyState);
+// console.log('Content Script: ユーザーエージェント:', navigator.userAgent);
 
-// デバッグ用に要素を確認
-setTimeout(() => {
-  console.log('Content Script: デバッグ情報 - ドキュメントの状態:');
-  console.log('- readyState:', document.readyState);
-  console.log('- title:', document.title);
-  console.log('- URL:', window.location.href);
+// デバッグ用に要素を確認（デバッグ時はコメントを外す）
+// setTimeout(() => {
+//   console.log('Content Script: デバッグ情報 - ドキュメントの状態:');
+//   console.log('- readyState:', document.readyState);
+//   console.log('- title:', document.title);
+//   console.log('- URL:', window.location.href);
   
-  // ページ内の要素数をカウント
-  const elements = document.querySelectorAll('*');
-  console.log(`- 要素の総数: ${elements.length}`);
+//   // ページ内の要素数をカウント
+//   const elements = document.querySelectorAll('*');
+//   console.log(`- 要素の総数: ${elements.length}`);
   
-  // よく使われる要素の数をカウント
-  const commonTags = ['div', 'p', 'span', 'article', 'section', 'main', 'header', 'footer'];
-  commonTags.forEach(tag => {
-    const count = document.getElementsByTagName(tag).length;
-    if (count > 0) {
-      console.log(`- <${tag}> 要素の数: ${count}`);
-    }
-  });
+//   // よく使われる要素の数をカウント
+//   const commonTags = ['div', 'p', 'span', 'article', 'section', 'main', 'header', 'footer'];
+//   commonTags.forEach(tag => {
+//     const count = document.getElementsByTagName(tag).length;
+//     if (count > 0) {
+//       console.log(`- <${tag}> 要素の数: ${count}`);
+//     }
+//   });
   
-  // クラス名に特定の文字列が含まれる要素を探す
-  const classKeywords = ['content', 'post', 'article', 'text', 'body', 'main'];
-  classKeywords.forEach(keyword => {
-    const elements = document.querySelectorAll(`[class*="${keyword}"]`);
-    if (elements.length > 0) {
-      console.log(`- クラス名に "${keyword}" を含む要素: ${elements.length} 個`);
-      if (elements.length < 5) {
-        elements.forEach((el, i) => {
-          console.log(`  ${i + 1}. クラス: ${el.className}, タグ: <${el.tagName.toLowerCase()}>`);
-          console.log(`     テキスト: "${el.textContent.substring(0, 50)}${el.textContent.length > 50 ? '...' : ''}"`);
-        });
-      }
-    }
-  });
+//   // クラス名に特定の文字列が含まれる要素を探す
+//   const classKeywords = ['content', 'post', 'article', 'text', 'body', 'main'];
+//   classKeywords.forEach(keyword => {
+//     const elements = document.querySelectorAll(`[class*="${keyword}"]`);
+//     if (elements.length > 0) {
+//       console.log(`- クラス名に "${keyword}" を含む要素: ${elements.length} 個`);
+//       if (elements.length < 5) {
+//         elements.forEach((el, i) => {
+//           console.log(`  ${i + 1}. クラス: ${el.className}, タグ: <${el.tagName.toLowerCase()}>`);
+//           console.log(`     テキスト: "${el.textContent.substring(0, 50)}${el.textContent.length > 50 ? '...' : ''}"`);
+//         });
+//       }
+//     }
+//   });
   
-  console.log('Content Script: デバッグ情報の出力を完了');
-}, 2000);
+//   console.log('Content Script: デバッグ情報の出力を完了');
+// }, 2000);
